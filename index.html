@@ -2,8 +2,58 @@
 <html>
 <head>
 	<title></title>
+
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,300,700' rel='stylesheet' type='text/css'>
+
+	<link href="css/style.css" type="text/css" rel="stylesheet">
+	<script type="text/javascript" src="js/d3.min.js"></script>
+
 </head>
 <body>
+
+<div id="container">
+	<div id="header">
+		<h1>Kubist</h1>
+	</div>
+
+	<div id="canvas"></div>
+
+	<div id="svg"></div>
+
+	<div id="dots"></div>
+
+	<div id="menu">
+		<p>
+			<label>Points</label>
+			<input type="number" id="pointsInput" value="300" />
+			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" checked id="rearrangeInput" /> <span>Rearrange</span></label>
+		</p>
+
+		<p>
+			<label>Circle size</label>
+			<input type="number" id="circleRadiusInput" value="2" />
+		</p>
+
+		<p>
+			<label>Line width</label>
+			<input type="number" id="lineStrokeInput" value="1" />
+		</p>
+
+		<hr />
+
+		<p>
+			<label class="fileinput">Custom image</label>
+			<input type="file" id="fileInput" />
+			<img id="preview" alt="" />
+		</p>
+	</div>
+
+</div>
+
+
+<script type="text/javascript" src="js/kubist.js"></script>
+<script type="text/javascript" src="js/kubist_ui.js"></script>
+
 
 </body>
 </html>

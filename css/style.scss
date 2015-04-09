@@ -1,7 +1,81 @@
-#container {}
+$bg: #f3f5f9;
+$fg: #1e2123;
+$grey1: #555;
+$grey2: #888;
+$fs: 10px;
+$head_h: 200px;
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+#container {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  background-color: $bg;
+  padding: 30px;
+}
+
+
+h1 {
+  font-size: $fs * 4.8;
+  color: $grey1;
+  font-weight: 300;
+  margin: 0;
+}
+
+#header {
+  height: $head_h;
+}
+
 
 #canvas {}
 
-#menu {}
+#menu {
+  position: absolute;
+  top: 0; right: 0; width: 300px; bottom: 0;
+  background-color: #eeeef1;
 
-#svg {}
+  p {
+    padding: 0px 10px 5px 20px;
+
+    label {
+      display: inline-block;
+      font-size: 12px;
+      min-width: 120px;
+      color: $grey2;
+
+      &.checkbox {
+        line-height: 30px;
+        > * { display: inline-block; vertical-align: middle;}
+      }
+
+      &.fileinput { margin-bottom: 10px;}
+    }
+
+    input[type="number"] {
+      padding: 5px;
+      width: 100px;
+
+      &[type="file"] {
+        width: auto;
+      }
+    }
+  }
+
+  hr {
+    margin: 20px;
+    border: none;
+    border-top: 1px solid #ddd;
+  }
+}
+
+#svg {
+  position: absolute;
+  top: $head_h; right: 330px; left: 30px; bottom: 60px;
+}
+
+#preview {
+  width: 150px;
+  max-width: 150px;
+}

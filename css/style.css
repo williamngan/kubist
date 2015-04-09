@@ -1,0 +1,62 @@
+body {
+  font-family: 'Roboto', sans-serif; }
+
+#container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f3f5f9;
+  padding: 30px; }
+
+h1 {
+  font-size: 48px;
+  color: #555555;
+  font-weight: 300;
+  margin: 0; }
+
+#header {
+  height: 200px; }
+
+#menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  bottom: 0;
+  background-color: #eeeef1; }
+  #menu p {
+    padding: 0px 10px 5px 20px; }
+    #menu p label {
+      display: inline-block;
+      font-size: 12px;
+      min-width: 120px;
+      color: #888888; }
+      #menu p label.checkbox {
+        line-height: 30px; }
+        #menu p label.checkbox > * {
+          display: inline-block;
+          vertical-align: middle; }
+      #menu p label.fileinput {
+        margin-bottom: 10px; }
+    #menu p input[type="number"] {
+      padding: 5px;
+      width: 100px; }
+      #menu p input[type="number"][type="file"] {
+        width: auto; }
+  #menu hr {
+    margin: 20px;
+    border: none;
+    border-top: 1px solid #ddd; }
+
+#svg {
+  position: absolute;
+  top: 200px;
+  right: 330px;
+  left: 30px;
+  bottom: 60px; }
+
+#preview {
+  width: 150px;
+  max-width: 150px; }
