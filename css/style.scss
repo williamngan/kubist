@@ -29,7 +29,10 @@ h1 {
 }
 
 
-#canvas {}
+#canvas {
+  position: absolute;
+  top: -10000px; left: -10000px;
+}
 
 #menu {
   position: absolute;

@@ -1,11 +1,15 @@
 (function() {
 
   var resetTimeout = -1;
+  var uiTimeout = -1;
 
   var svg = {
+    container: document.querySelector("#svg"),
     width: 500,
-    height: 500,
-    element: d3.select("#svg").append("svg"),
+    height: 600,
+    maxWidth: 500,
+    maxHeight: 500,
+    element: d3.select("#svg").append("svg").attr("shape-rendering", "geometricPrecision"),
     polygons: null,
     circles: null,
     vertices: [],
@@ -13,16 +17,20 @@
   }
 
   var config = {
-    points: 300,
-    radius: 3,
-    stroke: 1,
+    points: 50,
+    radius: 0,
+    stroke: 0,
     rearrange: false
   }
 
   var img = {
     preview: document.querySelector("#preview"),
-    canvas: document.createElement("canvas")
+    canvas: document.createElement("canvas"),
+    loaded: false
   }
+
+  document.querySelector("#canvas").appendChild( img.canvas );
+
 
   var sample = null;
   var dotCount = 0;
@@ -30,11 +38,35 @@
   reset();
 
   function reset() {
-    svg.element.html = "";
+
+    console.log("reset---")
+
+    svg.maxWidth = svg.container.offsetWidth;
+    svg.maxHeight = svg.container.offsetHeight;
+
+    var w = (img.loaded) ? img.preview.offsetWidth : svg.maxWidth;
+    var h = (img.loaded) ? img.preview.offsetHeight : svg.maxHeight;
+    var scale = Math.min( svg.maxWidth / w, svg.maxHeight / h );
+
+    svg.width = w * scale;
+    svg.height = h * scale;
+
+//    if (scaleW > scaleH) {
+//      svg.width = svg.maxWidth;
+//      svg.height = svg.maxHeight * scaleH / scaleW;
+//    } else {
+//      svg.height = svg.maxHeight;
+//      svg.width = svg.maxWidth * scaleW / scaleH;
+//      console.log( scaleW, scaleH, scaleW/scaleH, svg.height );
+//    }
+
+    svg.element.selectAll("g").remove()
     svg.element.attr("width", svg.width).attr("height", svg.height );
     svg.polygons = svg.element.append("g").attr("id", "polygons").selectAll("polygon");
     svg.circles = svg.element.append("g").attr("id", "circles");
     svg.dots.innerHTML = "";
+
+
 
     sample = bestCandidateSampler(svg.width, svg.height, 10, config.points);
 
@@ -45,9 +77,6 @@
 
   window.onresize = function(evt) {
     clearTimeout( resetTimeout );
-    svg.width = window.innerWidth;
-    svg.height = window.innerHeight;
-
     resetTimeout = setTimeout( function() {
       reset();
     }, 500);
@@ -58,8 +87,11 @@
   // UI and listeners
   var pointsInput = document.querySelector("#pointsInput");
   pointsInput.addEventListener("input", function(evt) {
-    config.points = Math.max( 0, parseInt( evt.target.value ) || 0 );
-    console.log( config )
+    clearTimeout( uiTimeout );
+    uiTimeout = setTimeout( function() {
+      config.points = Math.max( 10, parseInt( evt.target.value ) || 10 );
+      reset()
+    }, 500 );
   });
 
   var rearrangeInput = document.querySelector("#rearrangeInput");
@@ -70,14 +102,36 @@
 
   var circleRadiusInput = document.querySelector("#circleRadiusInput");
   circleRadiusInput.addEventListener("input", function(evt) {
-    config.radius = Math.max( 0, parseInt( evt.target.value ) || 0 );
-    console.log( config )
+    clearTimeout( uiTimeout );
+    uiTimeout = setTimeout( function() {
+      config.radius = Math.max( 0, parseInt( evt.target.value ) || 0 );
+      svg.element.selectAll("circle").attr("r", parseInt( config.radius ));
+    }, 300 );
   });
 
   var lineStrokeInput = document.querySelector("#lineStrokeInput");
     lineStrokeInput.addEventListener("input", function(evt) {
     config.stroke =  Math.max( 0, parseInt( evt.target.value ) || 0 );
-    console.log( config )
+
+    clearTimeout( uiTimeout );
+    uiTimeout = setTimeout( function() {
+      svg.element.selectAll("polygon").attr("style", function(d) {
+        this.style.stroke = (config.stroke > 0) ? "#f3f5f9" : this.style.fill;
+        this.style.strokeWidth = (config.stroke > 0) ? config.stroke+"px" : "0.5px";
+        return this.style.cssText;
+
+//        var styles = this.getAttribute("style").split(";");
+//        var f = [];
+//        for (var i=0; i<styles.length; i++) {
+//          if (styles[i].indexOf("stroke-width") < 0) {
+//            f.push( styles[i]);
+//          }
+//        }
+//        f.push( "stroke-width:"+config.stroke+"px");
+//        return f.join(";");
+      });
+
+    }, 300 );
   });
 
   var fileInput = document.querySelector("#fileInput");
@@ -89,12 +143,14 @@
       var FR= new FileReader();
       FR.onload = function(e) {
         img.preview.onload = function() {
-          img.canvas.width = img.preview.width * 2;
-          img.canvas.height = img.preview.height * 2;
+          img.canvas.width = img.preview.width ;
+          img.canvas.height = img.preview.height;
           img.canvas.getContext('2d').drawImage(img.preview, 0, 0, img.preview.width, img.preview.height );
-          reset();
+          img.loaded = true;
+          reset( img.preview.width, img.preview.height );
         };
         img.preview.setAttribute("src", e.target.result );
+
       };
       FR.readAsDataURL( this.files[0] );
     }
@@ -104,32 +160,36 @@
 
   function redraw() {
     svg.vertices = svg.circles.selectAll("circle")[0].map( function(d) {
-      return [d.cx.baseVal.value, d.cy.baseVal.value];
+      return [ Math.floor(d.cx.baseVal.value), Math.floor(d.cy.baseVal.value)];
     });
 
     var path = svg.polygons;
     var str = "";
 
+    console.log("redraw---");
     path = path.data(d3.geom.delaunay(svg.vertices).map(function(d) { return d.join(","); }));
     path.exit().remove();
     path.enter().append("polygon")
         .attr("points", function(d) { return d; } )
         .attr("style", function (d, i) {
-//          if (this && imageUrl) {
-//            var box = this.getBBox();
-//
-//            var sx = Math.floor( canvas.width * (box.x + box.width/2) / width )
-//            var sy = Math.floor( canvas.height * (box.y + box.height/2) / height )
-//            var px = canvas.getContext('2d').getImageData(sx, sy, 1, 1).data
-//            var fill = "rgb("+px[0]+","+px[1]+","+px[2]+")"
-//          } else {
+          var fill;
+
+          // paint images
+          if (this && img.loaded) {
+            var box = this.getBBox();
+            var sx = Math.floor( img.canvas.width * (box.x + box.width/2) / svg.width );
+            var sy = Math.floor( img.canvas.height * (box.y + box.height/2) / svg.height );
+            var px = img.canvas.getContext('2d').getImageData(sx, sy, 1, 1).data
+            fill = "rgb("+px[0]+","+px[1]+","+px[2]+")"
+
+          } else {
             var f = "CDE"[Math.floor( i%3 )];
-            var fill = "#"+f+f+f
-//          }
+            fill = "#"+f+f+f
+          }
 
-          var stroke = (config.stroke > 0) ? "stroke:#fff;" : '';
+          var stroke = (config.stroke > 0) ? "stroke-width: "+config.stroke+"px;stroke:#f3f5f9;" : "stroke-width: 0.5px;stroke: "+fill+";";
 
-          return "fill:"+fill+";"+stroke;
+          return "fill:"+fill+";"+"stroke-linejoin:bevel;"+stroke;
 
         }
     )
@@ -139,7 +199,7 @@
   function generate() {
     d3.timer( function() {
 
-      for (var i = 0; i < 10; ++i) {
+      for (var i = 0; i < config.points; ++i) {
         var s = sample();
         if (!s) return true;
 
@@ -162,6 +222,8 @@
 
         dotCount++;
       }
+
+
       redraw();
 
     });
@@ -169,20 +231,29 @@
 
 
 
-  // Best candidate sampling
+  // Best candidate sampling, based on http://bl.ocks.org/mbostock/b17e0b2aa8b2d50de465
   function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
+
+    
     var numSamples = 0;
 
     var quadtree = d3.geom.quadtree()
         .extent([[0, 0], [width, height]])
         ([[Math.random() * width, Math.random() * height]]);
 
+    var distance = function(a, b) {
+      var dx = a[0] - b[0],
+          dy = a[1] - b[1];
+      return dx * dx + dy * dy;
+    };
+
     return function() {
       if (++numSamples > numSamplesMax) return;
       var bestCandidate, bestDistance = 0;
       for (var i = 0; i < numCandidates; ++i) {
-        var c = [Math.random() * width, Math.random() * height],
-            d = distance(search(c[0], c[1]), c);
+        var c = [Math.random() * width, Math.random() * height];
+        var d = distance(quadtree.find(c), c);
+
         if (d > bestDistance) {
           bestDistance = d;
           bestCandidate = c;
@@ -192,56 +263,6 @@
       return bestCandidate;
     };
 
-    function distance(a, b) {
-      var dx = a[0] - b[0],
-          dy = a[1] - b[1];
-      return dx * dx + dy * dy;
-    };
-
-    // Find the closest node to the specified point.
-    function search(x, y) {
-      var x0 = 0,
-          y0 = 0,
-          x3 = width,
-          y3 = width,
-          minDistance2 = Infinity,
-          closestPoint;
-
-      (function find(node, x1, y1, x2, y2) {
-        var point;
-
-        // stop searching if this cell canÃ¢â‚¬â„¢t contain a closer node
-        if (x1 > x3 || y1 > y3 || x2 < x0 || y2 < y0) return;
-
-        // visit this point
-        if (point = node.point) {
-          var dx = x - point[0],
-              dy = y - point[1],
-              distance2 = dx * dx + dy * dy;
-          if (distance2 < minDistance2) {
-            var distance = Math.sqrt(minDistance2 = distance2);
-            x0 = x - distance, y0 = y - distance;
-            x3 = x + distance, y3 = y + distance;
-            closestPoint = point;
-          }
-        }
-
-        // bisect the current node
-        var children = node.nodes,
-            xm = (x1 + x2) * .5,
-            ym = (y1 + y2) * .5,
-            right = x > xm,
-            below = y > ym;
-
-        // visit closest cell first
-        if (node = children[below << 1 | right]) find(node, right ? xm : x1, below ? ym : y1, right ? x2 : xm, below ? y2 : ym);
-        if (node = children[below << 1 | !right]) find(node, right ? x1 : xm, below ? ym : y1, right ? xm : x2, below ? y2 : ym);
-        if (node = children[!below << 1 | right]) find(node, right ? xm : x1, below ? y1 : ym, right ? x2 : xm, below ? ym : y2);
-        if (node = children[!below << 1 | !right]) find(node, right ? x1 : xm, below ? y1 : ym, right ? xm : x2, below ? ym : y2);
-      })(quadtree, x0, y0, x3, y3);
-
-      return closestPoint;
-    }
   }
 
 })();
