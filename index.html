@@ -3,7 +3,7 @@
 <head>
 	<title></title>
 
-	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,300,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,100' rel='stylesheet' type='text/css'>
 
 	<link href="css/style.css" type="text/css" rel="stylesheet">
 	<script type="text/javascript" src="js/d3.min.js"></script>
@@ -18,15 +18,17 @@
 
 	<div id="canvas"></div>
 
-	<div id="svg"></div>
+	<div id="svg">
+
+	</div>
 
 	<div id="dots"></div>
+
 
 	<div id="menu">
 		<p>
 			<label>Points</label>
 			<input type="number" id="pointsInput" value="50" />
-			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" checked id="rearrangeInput" /> <span>Rearrange</span></label>
 		</p>
 
 		<p>
@@ -39,16 +41,31 @@
 			<input type="number" id="lineStrokeInput" value="0" />
 		</p>
 
+		<p>
+			<label>Variations</label>
+			<select id="visualizationInput">
+				<option value="delaunay">Triangle</option>
+				<option value="voronoi">Cell</option>
+				<option value="bubble">Circle</option>
+			</select>
+
+			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" checked id="gradientInput" /> <span>Color Gradient</span></label>
+
+
+		</p>
+
 		<hr />
 
 		<p>
-			<label class="fileinput">Custom image</label>
+			<label class="fileinput">Image</label>
 			<input type="file" id="fileInput" />
 			<img id="preview" alt="" />
 		</p>
 	</div>
 
 </div>
+
+<script type="text/javascript" src="js/kubist_ui.js"></script>
 
 </body>
 </html>
