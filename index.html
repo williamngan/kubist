@@ -32,6 +32,15 @@
 		</p>
 
 		<p>
+			<label>Style</label>
+			<select id="visualizationInput">
+				<option value="delaunay">Triangle</option>
+				<option value="voronoi">Cell</option>
+			</select>
+			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="gradientInput" /> <span>Color Gradient</span></label>
+		</p>
+
+		<p>
 			<label>Circle size</label>
 			<input type="number" id="circleRadiusInput" value="0" />
 		</p>
@@ -41,18 +50,7 @@
 			<input type="number" id="lineStrokeInput" value="0" />
 		</p>
 
-		<p>
-			<label>Variations</label>
-			<select id="visualizationInput">
-				<option value="delaunay">Triangle</option>
-				<option value="voronoi">Cell</option>
-				<option value="bubble">Circle</option>
-			</select>
 
-			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" checked id="gradientInput" /> <span>Color Gradient</span></label>
-
-
-		</p>
 
 		<hr />
 

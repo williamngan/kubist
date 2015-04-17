@@ -20,15 +20,16 @@
       element: d3.select("#svg").append("svg").attr("shape-rendering", "geometricPrecision").attr("id", "svgElem"),
       polygons: null,
       circles: null,
+      defs: null,
       vertices: [],
       dots: document.querySelector("#dots")
     }
 
     var config = {
-      points: 50,
+      points:50,
       radius: 0,
       stroke: 0,
-      gradient: true,
+      gradient: false,
       type: "delaunay"
     }
 
@@ -40,14 +41,35 @@
 
     document.querySelector("#canvas").appendChild( img.canvas );
 
-
+    // Dots
     var sample = null;
     var dots = document.querySelector("#dots");
     var dotSize = 8;
     var dotCount = 0;
 
+
+    // Image loaded
+    img.preview.onload = function() {
+      img.canvas.width = img.preview.width ;
+      img.canvas.height = img.preview.height;
+      img.canvas.getContext('2d').drawImage(img.preview, 0, 0, img.preview.width, img.preview.height );
+      img.loaded = true;
+      reset( img.preview.width, img.preview.height );
+    };
+
+    // Window resize
+    window.onresize = function(evt) {
+      clearTimeout( resetTimeout );
+      resetTimeout = setTimeout( function() {
+        reset();
+      }, 500);
+    };
+
+    // Init
     reset();
 
+
+    // Reset and regenerate the points
     function reset() {
 
       console.log("reset---")
@@ -62,25 +84,16 @@
       svg.width = w * scale;
       svg.height = h * scale;
 
-      //    if (scaleW > scaleH) {
-      //      svg.width = svg.maxWidth;
-      //      svg.height = svg.maxHeight * scaleH / scaleW;
-      //    } else {
-      //      svg.height = svg.maxHeight;
-      //      svg.width = svg.maxWidth * scaleW / scaleH;
-      //      console.log( scaleW, scaleH, scaleW/scaleH, svg.height );
-      //    }
-
-      svg.element.selectAll("g").remove()
+      svg.element.selectAll("g, defs").remove()
       svg.element.attr("width", svg.width).attr("height", svg.height );
-      svg.polygons = svg.element.append("g").attr("id", "polygons").selectAll("polygon");
+      svg.polygons = svg.element.append("g").attr("id", "polygons");
       svg.circles = svg.element.append("g").attr("id", "circles");
+      svg.defs = svg.element.append("defs");
       svg.dots.innerHTML = "";
 
       sample = bestCandidateSampler(svg.width, svg.height, 10, config.points);
 
       generate();
-
 
       var pos = document.querySelector("#svgElem").getBoundingClientRect();
       dots.style.left = pos.left+"px";
@@ -90,180 +103,12 @@
     }
 
 
-
-    window.onresize = function(evt) {
-      clearTimeout( resetTimeout );
-      resetTimeout = setTimeout( function() {
-        reset();
-      }, 500);
-    };
-
-
-
-    // UI and listeners
-    var pointsInput = document.querySelector("#pointsInput");
-    pointsInput.addEventListener("input", function(evt) {
-      clearTimeout( uiTimeout );
-      uiTimeout = setTimeout( function() {
-        config.points = Math.max( 10, parseInt( evt.target.value ) || 10 );
-        reset()
-      }, 500 );
-    });
-
-    var gradientInput = document.querySelector("#gradientInput");
-    gradientInput.addEventListener("change", function(evt) {
-      config.gradient = evt.target.checked;
-      redraw();
-      console.log( config )
-    });
-
-    var circleRadiusInput = document.querySelector("#circleRadiusInput");
-    circleRadiusInput.addEventListener("input", function(evt) {
-      clearTimeout( uiTimeout );
-      uiTimeout = setTimeout( function() {
-        config.radius = Math.max( 0, parseInt( evt.target.value ) || 0 );
-        svg.element.selectAll("circle").attr("r", parseInt( config.radius ));
-      }, 300 );
-    });
-
-    var lineStrokeInput = document.querySelector("#lineStrokeInput");
-    lineStrokeInput.addEventListener("input", function(evt) {
-      config.stroke =  Math.max( 0, parseInt( evt.target.value ) || 0 );
-
-      clearTimeout( uiTimeout );
-      uiTimeout = setTimeout( function() {
-        svg.element.selectAll("polygon").attr("style", function(d) {
-          this.style.stroke = (config.stroke > 0) ? "#f3f5f9" : this.style.fill;
-          this.style.strokeWidth = (config.stroke > 0) ? config.stroke+"px" : "0.5px";
-          return this.style.cssText;
-
-          //        var styles = this.getAttribute("style").split(";");
-          //        var f = [];
-          //        for (var i=0; i<styles.length; i++) {
-          //          if (styles[i].indexOf("stroke-width") < 0) {
-          //            f.push( styles[i]);
-          //          }
-          //        }
-          //        f.push( "stroke-width:"+config.stroke+"px");
-          //        return f.join(";");
-        });
-
-      }, 300 );
-    });
-
-    var visualizationInput = document.querySelector("#visualizationInput");
-    visualizationInput.addEventListener("change", function(evt) {
-      config.type = this.value;
-      reset();
-    });
-
-    var fileInput = document.querySelector("#fileInput");
-    fileInput.addEventListener("change", readImage, false );
-
-
-    function readImage() {
-      if ( this.files && this.files[0] ) {
-        var FR= new FileReader();
-        FR.onload = function(e) {
-          img.preview.onload = function() {
-            img.canvas.width = img.preview.width ;
-            img.canvas.height = img.preview.height;
-            img.canvas.getContext('2d').drawImage(img.preview, 0, 0, img.preview.width, img.preview.height );
-            img.loaded = true;
-            reset( img.preview.width, img.preview.height );
-          };
-          img.preview.setAttribute("src", e.target.result );
-
-        };
-        FR.readAsDataURL( this.files[0] );
-      }
-    }
-
-
-
-    function redraw() {
-      svg.vertices = svg.circles.selectAll("circle")[0].map( function(d) {
-        return [ Math.floor(d.cx.baseVal.value), Math.floor(d.cy.baseVal.value)];
-      });
-
-      var path = svg.polygons;
-      var str = "";
-      var count = 0;
-
-      console.log("redraw---");
-
-      if (config.type=="voronoi") {
-        var viz = d3.geom.voronoi().clipExtent([[0, 0], [svg.width, svg.height]] );
-        path = path.data( viz(svg.vertices).map(function(d) { return d.join(","); }));
-      } else if (config.type=="delaunay") {
-        path = path.data( d3.geom.delaunay(svg.vertices).map(function(d) { return d.join(","); }));
-      }
-
-
-
-      path.exit().remove();
-      path.enter().append("polygon")
-          .attr("points", function(d) { return d; } )
-          .attr("style", function (d, i) {
-            var fill;
-
-            // paint images
-            if (this && img.loaded) {
-              count++;
-              var box = this.getBBox();
-
-              if (config.gradient) {
-
-                var p1 = this.points[0] || box;
-                var p2 = this.points[1] || {x: box.x+box.width, y:box.y+box.height};
-
-                var sx1 = Math.floor( img.canvas.width * (p1.x) / svg.width );
-                var sy1 = Math.floor( img.canvas.height * (p1.y ) / svg.height );
-                var sx2 = Math.floor( img.canvas.width * (p2.x) / svg.width );
-                var sy2 = Math.floor( img.canvas.height * (p2.y) / svg.height );
-
-                var px1 = img.canvas.getContext('2d').getImageData(sx1, sy1, 1, 1).data;
-                var px2 = img.canvas.getContext('2d').getImageData(sx2, sy2, 1, 1).data;
-
-                fill = "url(#"+createGradientDef(count, px1, px2, box)+")";
-
-              } else {
-                var sx = Math.floor( img.canvas.width * (box.x + box.width/2) / svg.width );
-                var sy = Math.floor( img.canvas.height * (box.y + box.height/2) / svg.height );
-                var px = img.canvas.getContext('2d').getImageData(sx, sy, 1, 1).data
-                fill = "rgb("+px[0]+","+px[1]+","+px[2]+")"
-              }
-
-
-            } else {
-              var f = "CDE"[Math.floor( i%3 )];
-              fill = "#"+f+f+f
-            }
-
-            var stroke = (config.stroke > 0) ? "stroke-width: "+config.stroke+"px;stroke:#f3f5f9;" : "stroke-width: 0.5px;stroke: "+fill+";";
-
-            return "fill:"+fill+";"+"stroke-linejoin:bevel;"+stroke;
-
-          }
-      )
-    }
-
-
+    // Generate points
     function generate() {
       d3.timer( function() {
         for (var i = 0; i < config.points; ++i) {
           var s = sample();
           if (!s) return true;
-
-          //        var dot = new Dot();
-          //        dot.style.left= s[0]+"px";
-          //        dot.style.top= s[1]+"px";
-          //        dot.setAttribute("id", "dot"+dotCount);
-          //        container.appendChild( dot );
-
-          //        var cfill = (circle_fill) ? "fill:#"+circle_fill : '';
-          //        var cstroke = (circle_stroke) ? "stroke:#"+circle_stroke : '';
-
 
           var dot = document.createElement("div");
           dot.classList.add("dot");
@@ -281,7 +126,6 @@
               .attr("id", "d"+dotCount+"c");
 
           dotCount++;
-
         }
 
         redraw();
@@ -289,6 +133,120 @@
     }
 
 
+    // Draw tessellations
+    function redraw() {
+
+      svg.element.selectAll("defs").remove()
+      svg.defs = svg.element.append("defs");
+
+      var path = svg.polygons.selectAll("polygon");
+      var count = 0;
+      var gradientData = []
+
+      svg.vertices = svg.circles.selectAll("circle")[0].map( function(d) {
+        return [ Math.floor(d.cx.baseVal.value), Math.floor(d.cy.baseVal.value)];
+      });
+
+
+      if (config.type=="voronoi") {
+        var viz = d3.geom.voronoi().clipExtent([[0, 0], [svg.width, svg.height]] );
+        path = path.data( viz(svg.vertices).map(function(d) { return d.join(","); }));
+      } else if (config.type=="delaunay") {
+        path = path.data( d3.geom.delaunay(svg.vertices).map(function(d) { return d.join(","); }));
+      }
+
+      // Create polygons
+      path.enter().append("polygon");
+
+      path.attr("points", function(d) { return d; } )
+          .attr("style", function (d, i) {
+            var fill;
+
+            // paint images
+            if (this && img.loaded) {
+              count++;
+              var box = this.getBBox();
+
+              if (config.gradient) {
+
+                var p1 = this.points[0] || box;
+                var p2 = this.points[1] || {x: box.x+box.width, y:box.y+box.height};
+
+                var sx1 = Math.min( img.canvas.width-1, Math.max( 0, Math.floor( img.canvas.width * (p1.x) / svg.width ) ));
+                var sy1 = Math.min( img.canvas.height-1, Math.max( 0, Math.floor( img.canvas.height * (p1.y ) / svg.height ) ));
+                var sx2 = Math.min( img.canvas.width-1, Math.max( 0, Math.floor( img.canvas.width * (p2.x) / svg.width ) ));
+                var sy2 = Math.min( img.canvas.height-1, Math.max( 0, Math.floor( img.canvas.height * (p2.y) / svg.height ) ));
+
+                var px1 = img.canvas.getContext('2d').getImageData(sx1, sy1, 1, 1).data;
+                var px2 = img.canvas.getContext('2d').getImageData(sx2, sy2, 1, 1).data;
+
+                var gg = createGradientDef(count, px1, px2, box);
+                gradientData.push(gg);
+
+                fill = "url(#"+gg.id+")";
+
+              // no gradient
+              } else {
+                var sx = Math.floor( img.canvas.width * (box.x + box.width/2) / svg.width );
+                var sy = Math.floor( img.canvas.height * (box.y + box.height/2) / svg.height );
+                var px = img.canvas.getContext('2d').getImageData(sx, sy, 1, 1).data
+                fill = "rgb("+px[0]+","+px[1]+","+px[2]+")"
+              }
+
+            // no image
+            } else {
+              var f = "CDE"[Math.floor( i%3 )];
+              fill = "#"+f+f+f
+            }
+
+            var stroke = (config.stroke > 0) ? "stroke-width: "+config.stroke+"px;stroke:#fff;" : "stroke-width: 0.5px;stroke: "+fill+";";
+            return "fill:"+fill+";"+"stroke-linejoin:bevel;"+stroke;
+          }
+      )
+
+      path.exit().remove();
+
+      updateGradient(gradientData);
+    }
+
+
+    // Create gradient definitions
+    function updateGradient(gradientData) {
+
+      var gradients = svg.defs.selectAll("linearGradient").data( gradientData, function(d) { return d.id; } );
+
+      gradients.exit().remove();
+
+      gradients.enter().append("linearGradient")
+        .attr("id", function(d) { return d.id; } )
+        .attr("gradientUnits", "userSpaceOnUse")
+        .selectAll("stop").data( function(d) { return d.stops; }).enter().append("stop");
+
+      gradients
+        .attr("x1", function(d) { return d.box.x; }).attr("y1", function(d) { return d.box.y; } )
+        .attr("x2", function(d) { return d.box.x + d.box.width })
+        .attr("y2", function(d) { return d.box.y + d.box.height })
+        .selectAll("stop")
+          .attr("offset", function(d) { return d.offset; })
+          .attr("stop-color", function(d) { return d.color; });
+    }
+
+
+    // Create gradient color object
+    function createGradientDef( index, c1, c2, box ) {
+      var id = "gd"+index;
+      return {
+        id: id,
+        box: box,
+        stops: [
+          {offset: "0%", color: "rgb("+c1[0]+","+c1[1]+","+c1[2]+")"},
+          {offset: "100%", color: "rgb("+c2[0]+","+c2[1]+","+c2[2]+")"}
+        ]
+      };
+    }
+
+
+    // Handles dot movement
     function onMove(target) {
 
       if (!target) return;
@@ -298,45 +256,12 @@
       var parentPos = dots.getBoundingClientRect();
       circle.attr("cx", rect.left - parentPos.left + dotSize ).attr("cy", rect.top - parentPos.top + dotSize );
 
-      svg.element.selectAll("#polygons").remove();
-      svg.polygons = svg.element.append("g").attr("id", "polygons").selectAll("polygon");
-
       redraw()
     }
 
-    function createGradientDef( index, c1, c2, box ) {
-      var id = "gd"+index;
-      var g = svg.element.select("#"+id);
-      if (g.empty()) {
-        svg.element.append("linearGradient")
-            .attr("id", id)
-            .attr("gradientUnits", "userSpaceOnUse")
-            .attr("x1", box.x).attr("y1", box.y)
-            .attr("x2", box.x + box.width).attr("y2", box.y + box.height)
-            .selectAll("stop")
-            .data([
-              {offset: "0%", color: "rgb("+c1[0]+","+c1[1]+","+c1[2]+")"},
-              {offset: "100%", color: "rgb("+c2[0]+","+c2[1]+","+c2[2]+")"}
-            ])
-            .enter().append("stop")
-            .attr("offset", function(d) { return d.offset; })
-            .attr("stop-color", function(d) { return d.color; });
-
-        } else {
-          g.attr("x1", box.x).attr("y1", box.y)
-            .attr("x2", box.x + box.width).attr("y2", box.y + box.height)
-            .data([
-                  {offset: "0%", color: "rgb("+c1[0]+","+c1[1]+","+c1[2]+")"},
-                  {offset: "100%", color: "rgb("+c2[0]+","+c2[1]+","+c2[2]+")"}
-                ]);
-      }
-
-      return id;
-    }
 
     // Best candidate sampling, based on http://bl.ocks.org/mbostock/b17e0b2aa8b2d50de465
     function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
-
 
       var numSamples = 0;
 
@@ -369,7 +294,75 @@
     }
 
 
-    var movable = function ( elem, parent ) {
+    // UI and listeners
+    var pointsInput = document.querySelector("#pointsInput");
+    pointsInput.addEventListener("input", function(evt) {
+      clearTimeout( uiTimeout );
+      uiTimeout = setTimeout( function() {
+        config.points = Math.min(5000, Math.max( 10, parseInt( evt.target.value ) || 10 ));
+        reset()
+      }, 300 );
+    });
+
+    var gradientInput = document.querySelector("#gradientInput");
+    gradientInput.addEventListener("change", function(evt) {
+      config.gradient = evt.target.checked;
+      redraw();
+    });
+
+    var circleRadiusInput = document.querySelector("#circleRadiusInput");
+    circleRadiusInput.addEventListener("input", function(evt) {
+      clearTimeout( uiTimeout );
+      uiTimeout = setTimeout( function() {
+        config.radius = Math.max( 0, parseInt( evt.target.value ) || 0 );
+        svg.element.selectAll("circle").attr("r", parseInt( config.radius ));
+      }, 300 );
+    });
+
+    var lineStrokeInput = document.querySelector("#lineStrokeInput");
+    lineStrokeInput.addEventListener("input", function(evt) {
+      config.stroke =  Math.max( 0, parseInt( evt.target.value ) || 0 );
+
+      clearTimeout( uiTimeout );
+      uiTimeout = setTimeout( function() {
+        svg.element.selectAll("polygon").attr("style", function(d) {
+          this.style.stroke = (config.stroke > 0) ? "#fff" : this.style.fill;
+          this.style.strokeWidth = (config.stroke > 0) ? config.stroke+"px" : "0.5px";
+          return this.style.cssText;
+        });
+
+      }, 300 );
+    });
+
+    var visualizationInput = document.querySelector("#visualizationInput");
+    visualizationInput.addEventListener("change", function(evt) {
+      config.type = this.value;
+      redraw();
+    });
+
+    var fileInput = document.querySelector("#fileInput");
+    fileInput.addEventListener("change", readImage, false );
+
+    // Read image from file picker
+    function readImage() {
+      if ( this.files && this.files[0] ) {
+        var FR= new FileReader();
+        FR.onload = function(e) {
+          img.preview.setAttribute("src", e.target.result );
+        };
+        FR.readAsDataURL( this.files[0] );
+      }
+    }
+
+    // Load existing image
+    function loadImage( file ) {
+      img.preview.src = "images/"+file;
+    }
+
+
+
+    // Make the dot element draggable
+    function movable ( elem, parent ) {
 
       var _dragMove = false;
       var _dragStart = false;

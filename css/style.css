@@ -28,17 +28,18 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 16px;
-  background-color: #000;
-  opacity: 0;
-  margin-left: -10px;
-  margin-top: -10px;
-  transition: opacity .5s; }
+  box-shadow: 0 0 0 0 #fff;
+  background-color: rgba(0, 0, 0, 0);
+  opacity: 1;
+  transform: translate(-8px, -8px);
+  transition: background-color .3s, box-shadow .3s; }
 
 #dots:hover > .dot {
-  opacity: .1; }
+  background-color: rgba(0, 0, 0, 0.15); }
 
 #dots > .dot:hover {
-  opacity: .3; }
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 3px #fff; }
 
 #svg {
   position: absolute;
@@ -93,6 +94,9 @@ h1 {
       width: 100px; }
       #menu p input[type="number"][type="file"] {
         width: auto; }
+    #menu p select {
+      padding: 5px;
+      width: 115px; }
   #menu hr {
     margin: 20px;
     border: none;
