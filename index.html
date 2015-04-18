@@ -7,6 +7,7 @@
 
 	<link href="css/style.css" type="text/css" rel="stylesheet">
 	<script type="text/javascript" src="js/d3.min.js"></script>
+	<script type="text/javascript" src="js/jsfeat-min.js"></script>
 
 </head>
 <body>
@@ -16,7 +17,7 @@
 		<h1>Kubist</h1>
 	</div>
 
-	<div id="canvas"></div>
+
 
 	<div id="svg">
 
@@ -26,6 +27,22 @@
 
 
 	<div id="menu">
+		<p>
+			<label class="sub">Select image</label><label>&nbsp;</label>
+
+			<label class="imageSelect" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
+			<label class="imageSelect" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
+			<label class="imageSelect" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
+			<label class="hint">Choose your own...</label>
+
+			<label class="fileinput">
+				<input type="file" id="fileInput" />
+			</label>
+
+		</p>
+
+		<hr />
+
 		<p>
 			<label>Points</label>
 			<input type="number" id="pointsInput" value="50" />
@@ -37,7 +54,10 @@
 				<option value="delaunay">Triangle</option>
 				<option value="voronoi">Cell</option>
 			</select>
-			<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="gradientInput" /> <span>Color Gradient</span></label>
+			<span id="imageOnlyControl">
+				<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="gradientInput" /> <span>Color Gradient</span></label>
+				<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="featureInput" /> <span id="analyzeLabel">Analyze image</span></label>
+			</span>
 		</p>
 
 		<p>
@@ -51,13 +71,10 @@
 		</p>
 
 
-
 		<hr />
-
 		<p>
-			<label class="fileinput">Image</label>
-			<input type="file" id="fileInput" />
 			<img id="preview" alt="" />
+			<div id="canvas"></div>
 		</p>
 	</div>
 

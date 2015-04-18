@@ -50,7 +50,7 @@ body {
 
 #svg {
   position: absolute;
-  top: $head_h; right: 330px; left: 30px; bottom: 60px;
+  top: $head_h; right: 380px; left: 50px; bottom: 60px;
   overflow: visible;
 
 
@@ -75,14 +75,18 @@ h1 {
 
 
 #canvas {
-  position: absolute;
-  top: -10000px; left: -10000px;
+  //position: absolute;
+  //bottom: 0px; left: 0px;
+  padding: 0px 10px 5px 20px
 }
 
 #menu {
   position: absolute;
-  top: 0; right: 0; width: 300px; bottom: 0;
-  background-color: #eeeef1;
+  top: 0; right: 0; width: 320px; bottom: 0;
+  background-color: darken($bg, 1);
+  border-left: 1px solid darken($bg, 3);
+  padding: 10px;
+  padding-top: 100px;
 
   p {
     padding: 0px 10px 5px 20px;
@@ -94,11 +98,21 @@ h1 {
       color: $grey2;
 
       &.checkbox {
+        cursor: pointer;
+        &:hover { color: #09f;}
         line-height: 30px;
         > * { display: inline-block; vertical-align: middle;}
       }
 
-      &.fileinput { margin-bottom: 10px;}
+      &.sub { margin-bottom: 20px;}
+      &.fileinput { margin-top: 10px;}
+      &.hint { color: #bbb;}
+
+      &.imageSelect {
+        color: #09f;
+        cursor: pointer;
+        &:hover { color: darken(#09f, 10);}
+      }
     }
 
     input[type="number"] {
@@ -119,13 +133,18 @@ h1 {
   hr {
     margin: 20px;
     border: none;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid darken($bg, 5);
   }
 }
 
 
 
 #preview {
-  width: 150px;
-  max-width: 150px;
+  position: fixed;
+  top: -10000px; left: -10000px;
+  max-width: 150px; max-height: 150px;
+}
+
+#imageOnlyControl {
+  display: none;
 }

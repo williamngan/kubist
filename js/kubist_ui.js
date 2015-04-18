@@ -30,16 +30,20 @@
       radius: 0,
       stroke: 0,
       gradient: false,
-      type: "delaunay"
+      type: "delaunay",
+      feature: false
     }
 
     var img = {
       preview: document.querySelector("#preview"),
       canvas: document.createElement("canvas"),
+      context: null,
+      grayscale: null,
       loaded: false
     }
 
     document.querySelector("#canvas").appendChild( img.canvas );
+    img.context = img.canvas.getContext("2d");
 
     // Dots
     var sample = null;
@@ -50,11 +54,21 @@
 
     // Image loaded
     img.preview.onload = function() {
-      img.canvas.width = img.preview.width ;
-      img.canvas.height = img.preview.height;
-      img.canvas.getContext('2d').drawImage(img.preview, 0, 0, img.preview.width, img.preview.height );
+
+      var scale = Math.min( 150 / img.preview.width, 150 / img.preview.height );
+
+      img.canvas.width = img.preview.width * scale;
+      img.canvas.height = img.preview.height * scale;
+      img.context.drawImage(img.preview, 0, 0, img.canvas.width, img.canvas.height );
+
+      var image_data = img.context.getImageData(0, 0, img.canvas.width, img.canvas.height);
+      img.grayscale = new jsfeat.matrix_t(img.canvas.width, img.canvas.height, jsfeat.U8_t | jsfeat.C1_t);
+      jsfeat.imgproc.grayscale(image_data.data, img.canvas.width, img.canvas.height, img.grayscale);
+
       img.loaded = true;
-      reset( img.preview.width, img.preview.height );
+
+      document.querySelector("#imageOnlyControl").style.display="block";
+      reset( img.canvas.width, img.canvas.height );
     };
 
     // Window resize
@@ -77,8 +91,8 @@
       svg.maxWidth = svg.container.offsetWidth;
       svg.maxHeight = svg.container.offsetHeight;
 
-      var w = (img.loaded) ? img.preview.offsetWidth : svg.maxWidth;
-      var h = (img.loaded) ? img.preview.offsetHeight : svg.maxHeight;
+      var w = (img.loaded) ? img.canvas.width : svg.maxWidth;
+      var h = (img.loaded) ? img.canvas.height : svg.maxHeight;
       var scale = Math.min( svg.maxWidth / w, svg.maxHeight / h );
 
       svg.width = w * scale;
@@ -93,45 +107,68 @@
 
       sample = bestCandidateSampler(svg.width, svg.height, 10, config.points);
 
-      generate();
-
       var pos = document.querySelector("#svgElem").getBoundingClientRect();
       dots.style.left = pos.left+"px";
       dots.style.top = pos.top+"px";
       dots.style.width = pos.width+"px";
       dots.style.height = pos.height+"px";
+
+      dotCount = 0;
+      generate( scale );
     }
 
 
     // Generate points
-    function generate() {
-      d3.timer( function() {
+    function generate( rescale ) {
+//      d3.timer( function() {
         for (var i = 0; i < config.points; ++i) {
           var s = sample();
           if (!s) return true;
+          createPoint(s, i);
+          dotCount++;
+        }
 
-          var dot = document.createElement("div");
+        if (config.feature && config.type=="delaunay" && img.grayscale) {
+          analyze(rescale);
+        }
+
+        redraw();
+//      });
+    }
+
+    // Use JSFeat to analyze image
+    function analyze( rescale ) {
+      var threshold = 25;
+      jsfeat.fast_corners.set_threshold(threshold);
+
+      var corners = [];
+      for(var i = 0; i < img.grayscale.cols*img.grayscale.rows; ++i) {
+        corners[i] = new jsfeat.keypoint_t(0,0,0,0);
+      }
+
+      var count = Math.max( 300, jsfeat.fast_corners.detect(img.grayscale, corners, 3) );
+      for (var i = 0; i < count; i++) {
+        createPoint( [corners[i].x*rescale, corners[i].y*rescale], i);
+        dotCount++;
+      }
+    }
+
+    function createPoint( p, i ) {
+      var dot = document.createElement("div");
           dot.classList.add("dot");
-          dot.style.left = s[0]+"px";
-          dot.style.top = s[1]+"px";
-          dot.setAttribute("id", "d"+dotCount);
+          dot.style.left = p[0]+"px";
+          dot.style.top = p[1]+"px";
+          dot.setAttribute("id", "d"+i);
           movable( dot, dots );
           dots.appendChild(dot);
 
           svg.circles.append("circle")
-              .attr("cx", s[0])
-              .attr("cy", s[1])
+              .attr("cx", p[0])
+              .attr("cy", p[1])
               .attr("r", config.radius )
               .attr("style", "fill:#fff")
-              .attr("id", "d"+dotCount+"c");
-
-          dotCount++;
-        }
-
-        redraw();
-      });
+              .attr("id", "d"+i+"c");
     }
-
 
     // Draw tessellations
     function redraw() {
@@ -177,8 +214,8 @@
                 var sx2 = Math.min( img.canvas.width-1, Math.max( 0, Math.floor( img.canvas.width * (p2.x) / svg.width ) ));
                 var sy2 = Math.min( img.canvas.height-1, Math.max( 0, Math.floor( img.canvas.height * (p2.y) / svg.height ) ));
 
-                var px1 = img.canvas.getContext('2d').getImageData(sx1, sy1, 1, 1).data;
-                var px2 = img.canvas.getContext('2d').getImageData(sx2, sy2, 1, 1).data;
+                var px1 = img.context.getImageData(sx1, sy1, 1, 1).data;
+                var px2 = img.context.getImageData(sx2, sy2, 1, 1).data;
 
                 var gg = createGradientDef(count, px1, px2, box);
                 gradientData.push(gg);
@@ -189,7 +226,7 @@
               } else {
                 var sx = Math.floor( img.canvas.width * (box.x + box.width/2) / svg.width );
                 var sy = Math.floor( img.canvas.height * (box.y + box.height/2) / svg.height );
-                var px = img.canvas.getContext('2d').getImageData(sx, sy, 1, 1).data
+                var px = img.context.getImageData(sx, sy, 1, 1).data
                 fill = "rgb("+px[0]+","+px[1]+","+px[2]+")"
               }
 
@@ -199,7 +236,7 @@
               fill = "#"+f+f+f
             }
 
-            var stroke = (config.stroke > 0) ? "stroke-width: "+config.stroke+"px;stroke:#fff;" : "stroke-width: 0.5px;stroke: "+fill+";";
+            var stroke = (config.stroke > 0) ? "stroke-width: "+config.stroke+"px;stroke:#f3f5f9;" : "stroke-width: 1px;stroke: "+fill+";";
             return "fill:"+fill+";"+"stroke-linejoin:bevel;"+stroke;
           }
       )
@@ -259,7 +296,6 @@
       redraw()
     }
 
-
     // Best candidate sampling, based on http://bl.ocks.org/mbostock/b17e0b2aa8b2d50de465
     function bestCandidateSampler(width, height, numCandidates, numSamplesMax) {
 
@@ -310,6 +346,12 @@
       redraw();
     });
 
+    var featureInput = document.querySelector("#featureInput");
+    featureInput.addEventListener("change", function(evt) {
+      config.feature = evt.target.checked;
+      reset();
+    });
+
     var circleRadiusInput = document.querySelector("#circleRadiusInput");
     circleRadiusInput.addEventListener("input", function(evt) {
       clearTimeout( uiTimeout );
@@ -355,8 +397,9 @@
     }
 
     // Load existing image
-    function loadImage( file ) {
-      img.preview.src = "images/"+file;
+    window.loadImage = function( target ) {
+      var file = target.getAttribute("data-id");
+      if (file) img.preview.src = "images/"+file;
     }
 
 

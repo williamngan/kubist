@@ -44,8 +44,8 @@ body {
 #svg {
   position: absolute;
   top: 150px;
-  right: 330px;
-  left: 30px;
+  right: 380px;
+  left: 50px;
   bottom: 60px;
   overflow: visible; }
   #svg > svg {
@@ -64,17 +64,18 @@ h1 {
   height: 150px; }
 
 #canvas {
-  position: absolute;
-  top: -10000px;
-  left: -10000px; }
+  padding: 0px 10px 5px 20px; }
 
 #menu {
   position: absolute;
   top: 0;
   right: 0;
-  width: 300px;
+  width: 320px;
   bottom: 0;
-  background-color: #eeeef1; }
+  background-color: #f0f2f7;
+  border-left: 1px solid #e9edf4;
+  padding: 10px;
+  padding-top: 100px; }
   #menu p {
     padding: 0px 10px 5px 20px; }
     #menu p label {
@@ -83,12 +84,24 @@ h1 {
       min-width: 120px;
       color: #888888; }
       #menu p label.checkbox {
+        cursor: pointer;
         line-height: 30px; }
+        #menu p label.checkbox:hover {
+          color: #09f; }
         #menu p label.checkbox > * {
           display: inline-block;
           vertical-align: middle; }
+      #menu p label.sub {
+        margin-bottom: 20px; }
       #menu p label.fileinput {
-        margin-bottom: 10px; }
+        margin-top: 10px; }
+      #menu p label.hint {
+        color: #bbb; }
+      #menu p label.imageSelect {
+        color: #09f;
+        cursor: pointer; }
+        #menu p label.imageSelect:hover {
+          color: #007acc; }
     #menu p input[type="number"] {
       padding: 5px;
       width: 100px; }
@@ -100,8 +113,14 @@ h1 {
   #menu hr {
     margin: 20px;
     border: none;
-    border-top: 1px solid #ddd; }
+    border-top: 1px solid #e2e7f0; }
 
 #preview {
-  width: 150px;
-  max-width: 150px; }
+  position: fixed;
+  top: -10000px;
+  left: -10000px;
+  max-width: 150px;
+  max-height: 150px; }
+
+#imageOnlyControl {
+  display: none; }
