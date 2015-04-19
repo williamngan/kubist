@@ -1,3 +1,6 @@
+html, body {
+  overflow-x: hidden; }
+
 body {
   font-family: 'Roboto', sans-serif; }
 
@@ -43,25 +46,28 @@ body {
 
 #svg {
   position: absolute;
-  top: 150px;
-  right: 380px;
-  left: 50px;
-  bottom: 60px;
-  overflow: visible; }
+  top: 100px;
+  right: 420px;
+  left: 100px;
+  bottom: 100px;
+  overflow: visible;
+  transition: right .5s; }
+  #svg.larger {
+    right: 100px; }
   #svg > svg {
     display: block;
     margin: 0 auto;
     overflow: visible; }
 
 h1 {
-  font-size: 38px;
-  color: #888888;
+  font-size: 30px;
+  color: #667788;
   font-weight: 100;
   margin: 0;
   letter-spacing: 0.05em; }
 
 #header {
-  height: 150px; }
+  padding: 20px 20px 30px 20px; }
 
 #canvas {
   padding: 0px 10px 5px 20px; }
@@ -69,51 +75,58 @@ h1 {
 #menu {
   position: absolute;
   top: 0;
-  right: 0;
+  right: -350px;
   width: 320px;
   bottom: 0;
-  background-color: #f0f2f7;
-  border-left: 1px solid #e9edf4;
+  background-color: #fff;
+  border-left: 1px solid #eceff6;
   padding: 10px;
-  padding-top: 100px; }
+  transition: right .5s, opacity .3s;
+  opacity: 0; }
+  #menu.open {
+    right: 0;
+    opacity: 1; }
   #menu p {
     padding: 0px 10px 5px 20px; }
     #menu p label {
       display: inline-block;
       font-size: 12px;
       min-width: 120px;
-      color: #888888; }
+      color: #667788;
+      font-weight: 400; }
       #menu p label.checkbox {
         cursor: pointer;
         line-height: 30px; }
         #menu p label.checkbox:hover {
-          color: #09f; }
+          color: #00a3f1; }
         #menu p label.checkbox > * {
           display: inline-block;
           vertical-align: middle; }
       #menu p label.sub {
-        margin-bottom: 20px; }
+        margin-bottom: 15px; }
       #menu p label.fileinput {
-        margin-top: 10px; }
+        margin-top: 15px; }
       #menu p label.hint {
         color: #bbb; }
-      #menu p label.imageSelect {
-        color: #09f;
+      #menu p label.action {
+        color: #00a3f1;
         cursor: pointer; }
-        #menu p label.imageSelect:hover {
-          color: #007acc; }
+        #menu p label.action:hover {
+          color: #00CCFF; }
     #menu p input[type="number"] {
       padding: 5px;
-      width: 100px; }
+      width: 100px;
+      border: 1px solid #99aabb; }
       #menu p input[type="number"][type="file"] {
         width: auto; }
     #menu p select {
       padding: 5px;
-      width: 115px; }
+      width: 115px;
+      border: 1px solid #99aabb; }
   #menu hr {
     margin: 20px;
     border: none;
-    border-top: 1px solid #e2e7f0; }
+    border-top: 1px solid #e5eaf2; }
 
 #preview {
   position: fixed;
@@ -124,3 +137,35 @@ h1 {
 
 #imageOnlyControl {
   display: none; }
+
+#info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 11px;
+  color: #667788; }
+  #info > a {
+    color: #667788;
+    text-decoration: none;
+    opacity: .65; }
+    #info > a:hover {
+      color: #00a3f1;
+      opacity: 1; }
+
+#close {
+  position: fixed;
+  right: 5px;
+  top: 0px;
+  font-weight: 100;
+  font-size: 2em;
+  line-height: 1;
+  padding: 10px;
+  display: block;
+  color: #667788;
+  cursor: pointer;
+  transform: rotateZ(0deg);
+  transition: transform .2s; }
+  #close:hover {
+    color: #00a3f1; }
+  #close.closed {
+    transform: rotateZ(-45deg); }

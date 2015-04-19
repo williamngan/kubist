@@ -68,7 +68,7 @@
       img.loaded = true;
 
       document.querySelector("#imageOnlyControl").style.display="block";
-      reset( img.canvas.width, img.canvas.height );
+      reset();
     };
 
     // Window resize
@@ -84,9 +84,10 @@
 
 
     // Reset and regenerate the points
-    function reset() {
+    function reset( resizeOnly ) {
 
-      console.log("reset---")
+      var lastW = svg.width;
+      var lastH = svg.height;
 
       svg.maxWidth = svg.container.offsetWidth;
       svg.maxHeight = svg.container.offsetHeight;
@@ -103,7 +104,6 @@
       svg.polygons = svg.element.append("g").attr("id", "polygons");
       svg.circles = svg.element.append("g").attr("id", "circles");
       svg.defs = svg.element.append("defs");
-      svg.dots.innerHTML = "";
 
       sample = bestCandidateSampler(svg.width, svg.height, 10, config.points);
 
@@ -113,23 +113,30 @@
       dots.style.width = pos.width+"px";
       dots.style.height = pos.height+"px";
 
-      dotCount = 0;
-      generate( scale );
+      if (resizeOnly === true) {
+        resize( lastW, lastH );
+      } else {
+        svg.dots.innerHTML = "";
+        dotCount = 0;
+        generate( scale );
+      }
     }
+
+    window.resetKubist = reset;
 
 
     // Generate points
     function generate( rescale ) {
 //      d3.timer( function() {
+        if (config.feature && img.grayscale) {
+          analyze(rescale);
+        }
+
         for (var i = 0; i < config.points; ++i) {
           var s = sample();
           if (!s) return true;
           createPoint(s, i);
           dotCount++;
-        }
-
-        if (config.feature && config.type=="delaunay" && img.grayscale) {
-          analyze(rescale);
         }
 
         redraw();
@@ -146,11 +153,34 @@
         corners[i] = new jsfeat.keypoint_t(0,0,0,0);
       }
 
-      var count = Math.max( 300, jsfeat.fast_corners.detect(img.grayscale, corners, 3) );
+      var count = Math.min( 300, jsfeat.fast_corners.detect(img.grayscale, corners, 3) );
+
       for (var i = 0; i < count; i++) {
         createPoint( [corners[i].x*rescale, corners[i].y*rescale], i);
         dotCount++;
       }
+    }
+
+
+    function resize( lastW, lastH ) {
+      var ds = dots.querySelectorAll(".dot");
+      for (var i=0; i<ds.length; i++) {
+        var x = parseFloat(ds[i].style.left) || ds[i].offsetLeft;
+        var y = parseFloat(ds[i].style.top) || ds[i].offsetTop;
+        x *= svg.width / lastW;
+        y *= svg.height / lastH;
+        ds[i].style.left = x + "px";
+        ds[i].style.top = y + "px";
+
+        svg.circles.append("circle")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", config.radius )
+            .attr("style", "fill:#fff")
+            .attr("id", ds[i].getAttribute("id")+"c");
+      }
+
+      redraw();
     }
 
     function createPoint( p, i ) {
@@ -206,8 +236,14 @@
 
               if (config.gradient) {
 
-                var p1 = this.points[0] || box;
-                var p2 = this.points[1] || {x: box.x+box.width, y:box.y+box.height};
+                var p1, p2;
+                if (config.type=="delaunay") {
+                  p1 = this.points[0] || {x: box.x, y: box.y };
+                  p2 = {x:(this.points[1].x + this.points[2].x)/2, y:(this.points[1].y + this.points[2].y)/2} || {x: box.x+box.width, y:box.y+box.height};
+                } else {
+                  p1 = {x: box.x, y: box.y };
+                  p2 = {x: box.x+box.width, y:box.y+box.height};
+                }
 
                 var sx1 = Math.min( img.canvas.width-1, Math.max( 0, Math.floor( img.canvas.width * (p1.x) / svg.width ) ));
                 var sy1 = Math.min( img.canvas.height-1, Math.max( 0, Math.floor( img.canvas.height * (p1.y ) / svg.height ) ));
@@ -403,6 +439,17 @@
     }
 
 
+    // Triggers download svg
+    window.downloadSVG = function() {
+      var pom = document.createElement('a');
+      pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(svg.container.innerHTML));
+      pom.setAttribute('download', "kubist.svg");
+      pom.style.display = 'none';
+      document.body.appendChild(pom);
+      pom.click();
+      document.body.removeChild(pom);
+    }
+
 
     // Make the dot element draggable
     function movable ( elem, parent ) {
@@ -410,7 +457,6 @@
       var _dragMove = false;
       var _dragStart = false;
       var _pos = {x: 0, y: 0};
-      var parentPos = parent.getBoundingClientRect();
 
       var onDragStart = function(evt) {
 
@@ -456,6 +502,7 @@
       };
 
       var move = function( p, dragging ) {
+        var parentPos = parent.getBoundingClientRect();
         elem.style.left = p.x - parentPos.left + "px";
         elem.style.top = p.y - parentPos.top + "px";
 

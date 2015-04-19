@@ -1,9 +1,15 @@
 $bg: #f3f5f9;
 $fg: #1e2123;
-$grey1: #555;
-$grey2: #888;
+$grey1: #456;
+$grey2: #678;
+$grey3: #9AB;
+$link: #00A3F1;
 $fs: 10px;
-$head_h: 150px;
+$head_h: 100px;
+
+html, body {
+  overflow-x: hidden;
+}
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -50,9 +56,13 @@ body {
 
 #svg {
   position: absolute;
-  top: $head_h; right: 380px; left: 50px; bottom: 60px;
+  top: $head_h; right: 420px; left: 100px; bottom: 100px;
   overflow: visible;
+  transition: right .5s;
 
+  &.larger {
+    right: 100px;
+  }
 
   > svg {
     display: block;
@@ -62,7 +72,7 @@ body {
 }
 
 h1 {
-  font-size: $fs * 3.8;
+  font-size: $fs * 3;
   color: $grey2;
   font-weight: 100;
   margin: 0;
@@ -70,7 +80,7 @@ h1 {
 }
 
 #header {
-  height: $head_h;
+  padding: 20px 20px 30px 20px;
 }
 
 
@@ -82,11 +92,17 @@ h1 {
 
 #menu {
   position: absolute;
-  top: 0; right: 0; width: 320px; bottom: 0;
-  background-color: darken($bg, 1);
-  border-left: 1px solid darken($bg, 3);
+  top: 0; right: -350px; width: 320px; bottom: 0;
+  background-color: #fff;
+  border-left: 1px solid darken($bg, 2);
   padding: 10px;
-  padding-top: 100px;
+  transition: right .5s, opacity .3s;
+  opacity: 0;
+
+  &.open {
+    right: 0;
+    opacity: 1;
+  }
 
   p {
     padding: 0px 10px 5px 20px;
@@ -96,28 +112,30 @@ h1 {
       font-size: 12px;
       min-width: 120px;
       color: $grey2;
+      font-weight: 400;
 
       &.checkbox {
         cursor: pointer;
-        &:hover { color: #09f;}
+        &:hover { color: $link;}
         line-height: 30px;
         > * { display: inline-block; vertical-align: middle;}
       }
 
-      &.sub { margin-bottom: 20px;}
-      &.fileinput { margin-top: 10px;}
+      &.sub { margin-bottom: 15px;}
+      &.fileinput { margin-top: 15px;}
       &.hint { color: #bbb;}
 
-      &.imageSelect {
-        color: #09f;
+      &.action {
+        color: $link;
         cursor: pointer;
-        &:hover { color: darken(#09f, 10);}
+        &:hover { color: #00CCFF;}
       }
     }
 
     input[type="number"] {
       padding: 5px;
       width: 100px;
+      border: 1px solid $grey3;
 
       &[type="file"] {
         width: auto;
@@ -127,13 +145,15 @@ h1 {
     select {
       padding: 5px;
       width: 115px;
+      border: 1px solid $grey3;
     }
+
   }
 
   hr {
     margin: 20px;
     border: none;
-    border-top: 1px solid darken($bg, 5);
+    border-top: 1px solid darken($bg, 4);
   }
 }
 
@@ -147,4 +167,44 @@ h1 {
 
 #imageOnlyControl {
   display: none;
+}
+
+#info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 11px;
+
+  color: $grey2;
+
+
+  > a {
+    color: $grey2;
+    text-decoration: none;
+    opacity: .65;
+
+    &:hover { color: $link; opacity: 1;}
+  }
+}
+
+#close {
+  position: fixed;
+  right: 5px; top: 0px;
+  font-weight: 100;
+  font-size: 2em;
+  line-height: 1;
+  padding: 10px;
+  display: block;
+  color: $grey2;
+  cursor: pointer;
+  transform: rotateZ(0deg);
+  transition: transform .2s;
+
+  &:hover {
+    color: $link;
+  }
+
+  &.closed {
+    transform: rotateZ(-45deg);
+  }
 }

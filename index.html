@@ -13,11 +13,6 @@
 <body>
 
 <div id="container">
-	<div id="header">
-		<h1>Kubist</h1>
-	</div>
-
-
 
 	<div id="svg">
 
@@ -25,15 +20,25 @@
 
 	<div id="dots"></div>
 
+	<div id="info">
+		<a href="https://twitter.com/williamngan" target="_blank">By @williamngan</a> &middot;
+		<a href="https://github.com/williamngan/kubist" target="_blank">Source code</a> &middot;
+		<a href="https://twitter.com/williamngan" target="_blank">How it works</a>
+	</div>
 
-	<div id="menu">
+	<div id="menu" class="open">
+		<h1 id="header">Kubist</h1>
+
+
+		<hr />
+
 		<p>
-			<label class="sub">Select image</label><label>&nbsp;</label>
+			<label class="sub">Select an image</label><label>&nbsp;</label>
 
-			<label class="imageSelect" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
-			<label class="imageSelect" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
-			<label class="imageSelect" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
-			<label class="hint">Choose your own...</label>
+			<label class="action" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
+			<label class="action" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
+			<label class="action" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
+			<label class="hint">Your own image...</label>
 
 			<label class="fileinput">
 				<input type="file" id="fileInput" />
@@ -42,11 +47,6 @@
 		</p>
 
 		<hr />
-
-		<p>
-			<label>Points</label>
-			<input type="number" id="pointsInput" value="50" />
-		</p>
 
 		<p>
 			<label>Style</label>
@@ -61,6 +61,11 @@
 		</p>
 
 		<p>
+			<label>Points</label>
+			<input type="number" id="pointsInput" value="50" />
+		</p>
+
+		<p>
 			<label>Circle size</label>
 			<input type="number" id="circleRadiusInput" value="0" />
 		</p>
@@ -72,15 +77,32 @@
 
 
 		<hr />
+		<p><label class="action" onclick="downloadSVG()">Download SVG file</label></p>
 		<p>
 			<img id="preview" alt="" />
 			<div id="canvas"></div>
 		</p>
+
 	</div>
+
+	<div id="close" onclick="menuToggle()">&times;</div>
 
 </div>
 
 <script type="text/javascript" src="js/kubist_ui.js"></script>
+
+<script type="text/javascript">
+	function menuToggle() {
+		document.querySelector("#menu").classList.toggle("open");
+		document.querySelector("#svg").classList.toggle("larger");
+		document.querySelector("#close").classList.toggle("closed");
+
+		setTimeout( function() {
+			resetKubist(true);
+		}, 600);
+
+	}
+</script>
 
 </body>
 </html>
