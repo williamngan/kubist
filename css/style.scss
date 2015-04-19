@@ -92,16 +92,15 @@ h1 {
 
 #menu {
   position: absolute;
-  top: 0; right: -350px; width: 320px; bottom: 0;
+  top: 0; right: -340px; width: 320px; bottom: 0;
   background-color: #fff;
   border-left: 1px solid darken($bg, 2);
   padding: 10px;
-  transition: right .5s, opacity .3s;
-  opacity: 0;
+  transition: right .5s;
+
 
   &.open {
     right: 0;
-    opacity: 1;
   }
 
   p {
@@ -119,10 +118,12 @@ h1 {
         &:hover { color: $link;}
         line-height: 30px;
         > * { display: inline-block; vertical-align: middle;}
+
+        &:last-child { line-height: 1; }
       }
 
       &.sub { margin-bottom: 15px;}
-      &.fileinput { margin-top: 15px;}
+      &.fileinput { margin-top: 15px; margin-left: 120px;}
       &.hint { color: #bbb;}
 
       &.action {
@@ -169,7 +170,7 @@ h1 {
   display: none;
 }
 
-#info {
+#info, #download {
   position: absolute;
   bottom: 20px;
   left: 20px;
@@ -185,6 +186,10 @@ h1 {
 
     &:hover { color: $link; opacity: 1;}
   }
+}
+
+#download {
+  left: -110px;
 }
 
 #close {

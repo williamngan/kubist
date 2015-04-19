@@ -26,6 +26,8 @@
 		<a href="https://twitter.com/williamngan" target="_blank">How it works</a>
 	</div>
 
+
+
 	<div id="menu" class="open">
 		<h1 id="header">Kubist</h1>
 
@@ -33,12 +35,10 @@
 		<hr />
 
 		<p>
-			<label class="sub">Select an image</label><label>&nbsp;</label>
-
-			<label class="action" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
-			<label class="action" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
-			<label class="action" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
-			<label class="hint">Your own image...</label>
+			<label>Select an image</label><label class="action" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
+			<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
+			<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
+			<label>&nbsp;</label><label class="hint">Your own image...</label>
 
 			<label class="fileinput">
 				<input type="file" id="fileInput" />
@@ -77,11 +77,12 @@
 
 
 		<hr />
-		<p><label class="action" onclick="downloadSVG()">Download SVG file</label></p>
 		<p>
 			<img id="preview" alt="" />
 			<div id="canvas"></div>
 		</p>
+
+		<div id="download"><a href="#" onclick="downloadSVG()">Download SVG file</a></div>
 
 	</div>
 

@@ -75,17 +75,15 @@ h1 {
 #menu {
   position: absolute;
   top: 0;
-  right: -350px;
+  right: -340px;
   width: 320px;
   bottom: 0;
   background-color: #fff;
   border-left: 1px solid #eceff6;
   padding: 10px;
-  transition: right .5s, opacity .3s;
-  opacity: 0; }
+  transition: right .5s; }
   #menu.open {
-    right: 0;
-    opacity: 1; }
+    right: 0; }
   #menu p {
     padding: 0px 10px 5px 20px; }
     #menu p label {
@@ -102,10 +100,13 @@ h1 {
         #menu p label.checkbox > * {
           display: inline-block;
           vertical-align: middle; }
+        #menu p label.checkbox:last-child {
+          line-height: 1; }
       #menu p label.sub {
         margin-bottom: 15px; }
       #menu p label.fileinput {
-        margin-top: 15px; }
+        margin-top: 15px;
+        margin-left: 120px; }
       #menu p label.hint {
         color: #bbb; }
       #menu p label.action {
@@ -138,19 +139,22 @@ h1 {
 #imageOnlyControl {
   display: none; }
 
-#info {
+#info, #download {
   position: absolute;
   bottom: 20px;
   left: 20px;
   font-size: 11px;
   color: #667788; }
-  #info > a {
+  #info > a, #download > a {
     color: #667788;
     text-decoration: none;
     opacity: .65; }
-    #info > a:hover {
+    #info > a:hover, #download > a:hover {
       color: #00a3f1;
       opacity: 1; }
+
+#download {
+  left: -110px; }
 
 #close {
   position: fixed;
