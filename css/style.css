@@ -78,10 +78,16 @@ h1 {
   bottom: 0;
   background-color: #fff;
   border-left: 1px solid #eceff6;
-  padding: 10px;
-  transition: right .5s;
-  overflow-y: auto;
-  overflow-x: hidden; }
+  transition: right .5s; }
+  #menu > .ui-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden; }
   #menu.open {
     right: 0; }
   #menu p {
@@ -154,7 +160,7 @@ h1 {
       opacity: 1; }
 
 #download {
-  left: -110px; }
+  left: -120px; }
 
 #close {
   position: fixed;

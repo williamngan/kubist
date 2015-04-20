@@ -29,58 +29,60 @@
 
 
 	<div id="menu" class="open">
-		<h1 id="header">Kubist</h1>
+		<div class="ui-menu">
+			<h1 id="header">Kubist</h1>
 
 
-		<hr />
+			<hr />
 
-		<p>
-			<label>Select an image</label><label class="action" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
-			<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
-			<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
-			<label>&nbsp;</label><label class="hint">Your own image...</label>
+			<p>
+				<label>Select an image</label><label class="action" onclick="loadImage(this)" data-id="mao.jpg">A guy</label>
+				<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bauhaus.jpg">A dance</label>
+				<label>&nbsp;</label><label class="action" onclick="loadImage(this)" data-id="bay.jpg">A view</label>
+				<label>&nbsp;</label><label class="hint">Your own image...</label>
 
-			<label class="fileinput">
-				<input type="file" id="fileInput" />
-			</label>
+				<label class="fileinput">
+					<input type="file" id="fileInput" />
+				</label>
 
-		</p>
+			</p>
 
-		<hr />
+			<hr />
 
-		<p>
-			<label>Style</label>
-			<select id="visualizationInput">
-				<option value="delaunay">Triangle</option>
-				<option value="voronoi">Cell</option>
-			</select>
-			<span id="imageOnlyControl">
-				<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="gradientInput" /> <span>Color Gradient</span></label>
-				<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="featureInput" /> <span id="analyzeLabel">Analyze image</span></label>
-			</span>
-		</p>
+			<p>
+				<label>Style</label>
+				<select id="visualizationInput">
+					<option value="delaunay">Triangle</option>
+					<option value="voronoi">Cell</option>
+				</select>
+				<span id="imageOnlyControl">
+					<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="gradientInput" /> <span>Color Gradient</span></label>
+					<label>&nbsp;</label><label class="checkbox"><input type="checkbox" id="featureInput" /> <span id="analyzeLabel">Analyze image</span></label>
+				</span>
+			</p>
 
-		<p>
-			<label>Points</label>
-			<input type="number" id="pointsInput" value="50" />
-		</p>
+			<p>
+				<label>Points</label>
+				<input type="number" id="pointsInput" value="50" />
+			</p>
 
-		<p>
-			<label>Circle size</label>
-			<input type="number" id="circleRadiusInput" value="0" />
-		</p>
+			<p>
+				<label>Circle size</label>
+				<input type="number" id="circleRadiusInput" value="0" />
+			</p>
 
-		<p>
-			<label>Border size</label>
-			<input type="number" id="lineStrokeInput" value="0" />
-		</p>
+			<p>
+				<label>Border size</label>
+				<input type="number" id="lineStrokeInput" value="0" />
+			</p>
 
 
-		<hr />
-		<p>
-			<img id="preview" alt="" />
-			<div id="canvas"></div>
-		</p>
+			<hr />
+			<p>
+				<img id="preview" alt="" />
+				<div id="canvas"></div>
+			</p>
+		</div>
 
 		<div id="download"><a href="#" onclick="downloadSVG()">Download SVG file</a></div>
 
