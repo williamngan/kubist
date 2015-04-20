@@ -29,7 +29,7 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 16px;
-  box-shadow: 0 0 0 0 #fff;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
   background-color: rgba(0, 0, 0, 0);
   opacity: 1;
   transform: translate(-8px, -8px);
@@ -40,7 +40,7 @@ body {
 
 #dots > .dot:hover {
   background-color: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 0 3px #fff; }
+  box-shadow: 0 0 0 3px white; }
 
 #svg {
   position: absolute;
@@ -78,18 +78,14 @@ h1 {
   bottom: 0;
   background-color: #fff;
   border-left: 1px solid #eceff6;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: right .5s; }
-  #menu > .ui-menu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    padding: 10px;
-    overflow-y: auto;
-    overflow-x: hidden; }
   #menu.open {
     right: 0; }
+  #menu #fileInput {
+    max-width: 175px; }
   #menu p {
     padding: 0px 10px 5px 20px; }
     #menu p label {
@@ -160,7 +156,10 @@ h1 {
       opacity: 1; }
 
 #download {
-  left: -120px; }
+  position: fixed;
+  left: auto;
+  right: 25px;
+  background-color: transparent; }
 
 #close {
   position: fixed;
