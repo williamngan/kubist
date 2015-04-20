@@ -1,6 +1,3 @@
-html, body {
-  overflow-x: hidden; }
-
 body {
   font-family: 'Roboto', sans-serif; }
 
@@ -12,6 +9,7 @@ body {
   right: 0;
   background-color: #f3f5f9;
   padding: 30px;
+  overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -81,7 +79,9 @@ h1 {
   background-color: #fff;
   border-left: 1px solid #eceff6;
   padding: 10px;
-  transition: right .5s; }
+  transition: right .5s;
+  overflow-y: auto;
+  overflow-x: hidden; }
   #menu.open {
     right: 0; }
   #menu p {

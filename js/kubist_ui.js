@@ -17,6 +17,7 @@
       height: 600,
       maxWidth: 500,
       maxHeight: 500,
+      maxPoints: 1000,
       element: d3.select("#svg").append("svg").attr("shape-rendering", "geometricPrecision").attr("id", "svgElem"),
       polygons: null,
       circles: null,
@@ -105,7 +106,7 @@
       svg.circles = svg.element.append("g").attr("id", "circles");
       svg.defs = svg.element.append("defs");
 
-      sample = bestCandidateSampler(svg.width, svg.height, 10, config.points);
+      sample = bestCandidateSampler(svg.width, svg.height, 5, config.points);
 
       var pos = document.querySelector("#svgElem").getBoundingClientRect();
       dots.style.left = pos.left+"px";
@@ -127,25 +128,28 @@
 
     // Generate points
     function generate( rescale ) {
-//      d3.timer( function() {
-        if (config.feature && img.grayscale) {
-          analyze(rescale);
-        }
 
-        for (var i = 0; i < config.points; ++i) {
-          var s = sample();
-          if (!s) return true;
-          createPoint(s, i);
-          dotCount++;
-        }
+      var ps = 0;
+      if (config.feature && img.grayscale) {
+        ps = analyze(rescale);
+      }
 
-        redraw();
-//      });
+      ps = Math.max( config.points - ps, config.points)
+
+      for (var i = 0; i < ps; ++i) {
+        var s = sample();
+        if (!s) return true;
+        createPoint(s, i);
+        dotCount++;
+      }
+
+      redraw();
+
     }
 
     // Use JSFeat to analyze image
     function analyze( rescale ) {
-      var threshold = 25;
+      var threshold = 30;
       jsfeat.fast_corners.set_threshold(threshold);
 
       var corners = [];
@@ -153,12 +157,14 @@
         corners[i] = new jsfeat.keypoint_t(0,0,0,0);
       }
 
-      var count = Math.min( 300, jsfeat.fast_corners.detect(img.grayscale, corners, 3) );
+      var count = Math.min( 500, jsfeat.fast_corners.detect(img.grayscale, corners, 3) );
 
       for (var i = 0; i < count; i++) {
         createPoint( [corners[i].x*rescale, corners[i].y*rescale], i);
         dotCount++;
       }
+
+      return count;
     }
 
 
@@ -371,8 +377,9 @@
     pointsInput.addEventListener("input", function(evt) {
       clearTimeout( uiTimeout );
       uiTimeout = setTimeout( function() {
-        config.points = Math.min(5000, Math.max( 10, parseInt( evt.target.value ) || 10 ));
-        reset()
+        config.points = Math.min(svg.maxPoints, Math.max( 10, parseInt( evt.target.value ) || 10 ));
+        if (parseInt( evt.target.value ) > svg.maxPoints) evt.target.value = svg.maxPoints;
+        reset();
       }, 300 );
     });
 

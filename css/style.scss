@@ -7,10 +7,6 @@ $link: #00A3F1;
 $fs: 10px;
 $head_h: 100px;
 
-html, body {
-  overflow-x: hidden;
-}
-
 body {
   font-family: 'Roboto', sans-serif;
 }
@@ -20,6 +16,7 @@ body {
   top: 0; bottom: 0; left: 0; right: 0;
   background-color: $bg;
   padding: 30px;
+  overflow: hidden;
 
   user-select: none;
   -webkit-user-select: none;
@@ -97,6 +94,8 @@ h1 {
   border-left: 1px solid darken($bg, 2);
   padding: 10px;
   transition: right .5s;
+  overflow-y: auto;
+  overflow-x: hidden;
 
 
   &.open {
