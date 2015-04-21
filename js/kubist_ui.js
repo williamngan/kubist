@@ -18,7 +18,7 @@
       maxWidth: 500,
       maxHeight: 500,
       maxPoints: 1000,
-      element: d3.select("#svg").append("svg").attr("shape-rendering", "geometricPrecision").attr("id", "svgElem"),
+      element: d3.select("#svg").append("svg").attr("shape-rendering", "geometricPrecision").attr("id", "svgElem").attr("xmlns","http://www.w3.org/2000/svg"),
       polygons: null,
       circles: null,
       defs: null,
