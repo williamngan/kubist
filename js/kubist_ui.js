@@ -51,6 +51,8 @@
     var dots = document.querySelector("#dots");
     var dotSize = 8;
     var dotCount = 0;
+    var imgData = null;
+    var hasOverlay = false;
 
 
     // Image loaded
@@ -121,6 +123,8 @@
         dotCount = 0;
         generate( scale );
       }
+
+      setBackground();
     }
 
     window.resetKubist = reset;
@@ -428,6 +432,12 @@
     var fileInput = document.querySelector("#fileInput");
     fileInput.addEventListener("change", readImage, false );
 
+    var overlayInput = document.querySelector("#overlay");
+    overlayInput.addEventListener("change", function(evt) {
+      hasOverlay = this.checked;
+      setBackground();
+    });
+
     // Read image from file picker
     function readImage() {
       if ( this.files && this.files[0] ) {
@@ -436,6 +446,18 @@
           img.preview.setAttribute("src", e.target.result );
         };
         FR.readAsDataURL( this.files[0] );
+      }
+    }
+
+    function setBackground() {
+      var bg = document.getElementById("bg");
+      bg.style = document.getElementById("dots").getAttribute("style");
+      if (hasOverlay) {
+        var preview = img.preview.getAttribute("src");
+        if (preview) bg.src = preview;
+        bg.style.display = "block";
+      } else {
+        bg.style.display = "none";
       }
     }
 

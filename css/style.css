@@ -15,6 +15,13 @@ body {
   -moz-user-select: none;
   -ms-user-select: none; }
 
+#bg {
+  z-index: 0;
+  position: absolute;
+  user-select: none;
+  display: block;
+  opacity: .3;}
+
 #dots {
   z-index: 1;
   position: absolute;
@@ -36,7 +43,8 @@ body {
   transition: background-color .3s, box-shadow .3s; }
 
 #dots:hover > .dot {
-  background-color: rgba(0, 0, 0, 0.15); }
+  background-color: rgba(0,0,0,.25);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.5); }
 
 #dots > .dot:hover {
   background-color: rgba(0, 0, 0, 0.4);
@@ -178,3 +186,4 @@ h1 {
     color: #00a3f1; }
   #close.closed {
     transform: rotateZ(-45deg); }
+
